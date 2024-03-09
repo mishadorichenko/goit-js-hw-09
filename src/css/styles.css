@@ -54,3 +54,8 @@ img {
 .gallery-item:focus {
   transform: scale(1.1);
 }
+
+/* form */
+.feedback-form {
+  display: flex;
+}
