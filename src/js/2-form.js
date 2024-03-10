@@ -1,41 +1,43 @@
-const form = document.querySelector('.feedback-form');
-const localStorageKey = 'feedback-form-state';
-const email = form.elements.email;
-const message = form.elements.message;
+const LOCAL_STORAGE_KEY = 'feedback-form-state';
 
-const storedFormData = JSON.parse(localStorage.getItem(localStorageKey)) || {
-  email: '',
-  message: '',
-};
+const feedbackForm = document.querySelector('.feedback-form');
 
-email.value = storedFormData.email;
-message.value = storedFormData.message;
+feedbackForm.addEventListener('input', formInputHandler);
+feedbackForm.addEventListener('submit', formSubmitHandler);
 
-form.addEventListener('input', event => {
-  const formData = {
-    email: email.value.trim(),
-    message: message.value.trim(),
-  };
-
-  saveFormData(formData);
-});
-
-form.addEventListener('submit', function (event) {
+function formInputHandler(event) {
   event.preventDefault();
-  if (email.value == '' || message.value == '') {
-    return alert('All form fields must be filled in');
+  const email = feedbackForm.elements.email.value.trim();
+  const textareaMessage = feedbackForm.elements.message.value.trim();
+  const data = JSON.stringify({ email, textareaMessage });
+
+  //   console.log({ email, textareaMessage });
+  //   console.log(data);
+
+  localStorage.setItem(LOCAL_STORAGE_KEY, data);
+}
+
+function formSubmitHandler(event) {
+  event.preventDefault();
+  const email = event.target.email.value.trim();
+  const textareaMessage = event.target.message.value.trim();
+  if (email === '' || textareaMessage === '') {
+    alert('Please complete all the fields!');
+    return;
   }
-  const formData = {
-    email: email.value.trim(),
-    message: message.value.trim(),
-  };
+  console.log({
+    email,
+    textareaMessage,
+  });
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  feedbackForm.reset();
+}
 
-  saveFormData(formData);
-  console.log(formData);
-  form.reset();
-  localStorage.removeItem(localStorageKey);
-});
-
-function saveFormData(formData) {
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+const dataFromLSJson = localStorage.getItem(LOCAL_STORAGE_KEY) ?? '';
+try {
+  const dataFromLS = JSON.parse(dataFromLSJson);
+  feedbackForm.elements.email.value = dataFromLS.email;
+  feedbackForm.elements.message.value = dataFromLS.textareaMessage;
+} catch {
+  console.log('No saved data!');
 }
